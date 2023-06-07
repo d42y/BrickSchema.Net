@@ -41,7 +41,7 @@ namespace BrickSchema.Net
         public List<BrickEntity> GetChildEntities()
         {
             var entities = OtherEntities
-            .Where(entity => entity.Relationships.Any(relationship => relationship.Type?.Equals(typeof(AssociatedWith).Name) ?? false && relationship.ParentId == this.Id))
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(AssociatedWith).Name) ?? false) && relationship.ParentId == this.Id))
             .ToList();
             entities.AddRange(GetFedEntitites().Except(entities));
             entities.AddRange(GetMeterEntities().Except(entities));
@@ -52,7 +52,7 @@ namespace BrickSchema.Net
         public List<BrickEntity> GetFedEntitites()
         {
             var entities = OtherEntities
-            .Where(entity => entity.Relationships.Any(relationship => relationship.Type?.Equals(typeof(Fedby).Name) ?? false && relationship.ParentId == this.Id))
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(Fedby).Name) ?? false) && relationship.ParentId == this.Id))
             .ToList();
             return entities;
         }
@@ -60,14 +60,14 @@ namespace BrickSchema.Net
         public List<BrickEntity> GetMeterEntities()
         {
             var entities = OtherEntities
-            .Where(entity => entity.Relationships.Any(relationship => relationship.Type?.Equals(typeof(MeterBy).Name) ?? false && relationship.ParentId == this.Id))
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(MeterBy).Name) ?? false) && relationship.ParentId == this.Id))
             .ToList();
             return entities;
         }
         public List<BrickEntity> GetPartEntitites()
         {
             var entities = OtherEntities
-            .Where(entity => entity.Relationships.Any(relationship => relationship.Type?.Equals(typeof(PartOf).Name) ?? false && relationship.ParentId == this.Id))
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(PartOf).Name) ?? false) && relationship.ParentId == this.Id))
             .ToList();
             return entities;
         }
@@ -89,7 +89,7 @@ namespace BrickSchema.Net
         public List<Classes.Point> GetPointEntities(List<Tag> tags)
         {
             var entities = OtherEntities
-            .Where(entity => entity.Relationships.Any(relationship => relationship.Type?.Equals(typeof(PointOf).Name) ?? false && relationship.ParentId == this.Id))
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(PointOf).Name) ?? false) && relationship.ParentId == this.Id))
             .ToList();
 
             List<Classes.Point> points = new List<Classes.Point>();
@@ -111,7 +111,7 @@ namespace BrickSchema.Net
         public List<Tag> GetTags()
         {
             var tags = OtherEntities
-            .Where(entity => entity.Relationships.Any(relationship => relationship.Type?.Equals(typeof(TagOf).Name) ?? false && relationship.ParentId == this.Id))
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(TagOf).Name) ?? false) && relationship.ParentId == this.Id))
             .ToList();
             List<Tag> foundTags = new List<Tag>();
             foreach (var tag in tags)
