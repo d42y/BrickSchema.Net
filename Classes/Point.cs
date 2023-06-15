@@ -19,8 +19,6 @@ namespace BrickSchema.Net.Classes
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public PointValueQuality Quality { get; set;  } = PointValueQuality.Unknown;
 
-       
-
 
         public void UpdateValue(double? value, DateTime timestamp, PointValueQuality valueQuality = PointValueQuality.Good)
         {

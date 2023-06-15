@@ -12,12 +12,23 @@ namespace BrickSchema.Net.Classes
             OnValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public string Name
+        {
+            get { return GetProperty<string>(EntityProperties.PropertiesEnum.Name) ?? string.Empty; }
+
+            set { AddOrUpdateProperty(EntityProperties.PropertiesEnum.Name, value); }
+        }
+
+        public string Description
+        {
+            get { return GetProperty<string>(EntityProperties.PropertiesEnum.Description) ?? string.Empty; }
+
+            set { AddOrUpdateProperty(EntityProperties.PropertiesEnum.Description, value); }
+        }
 
         public BrickClass CloneIdentity()
         {
-            Point point = new Point();
+            BrickClass point = new BrickClass();
             point.Id = Id;
             point.Type = Type;
             point.Name = Name;

@@ -1,4 +1,6 @@
 ﻿using BrickSchema.Net.Relationships;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +11,22 @@ namespace BrickSchema.Net
 {
     public class BrickBehavior : BrickEntity
     {
-        public string Name { get; set; }
-        protected bool IsRunning { get; set; } = false;
-        protected int PollRate { get; set; } = 0;
+        protected ILogger? _logger;
+        public string Name { get { return GetProperty<string>("Name")??string.Empty; } }
+        protected bool IsRunning { get { return GetProperty<bool>("Running"); } }
+        protected int PollRate
+        {
+            get
+            {
+                return GetProperty<int>("PollRate");
+            }
+
+            set
+            {
+                AddOrUpdateProperty("PoolRate", value);
+            }
+
+        }
         public BrickEntity? Parent { get; set; } = null;
         protected Timer? BehaviorTimer { get; set; } = null;
 
@@ -43,25 +58,41 @@ namespace BrickSchema.Net
         {
             Errors.Clear();
         }
-        public BrickBehavior(string name, string type)
+        public BrickBehavior(string name, string type, ILogger? logger = null)
         {
-            Name = name;
+            AddOrUpdateProperty("Name", name);
+            AddOrUpdateProperty("Running", false);
             Type = type;
+            _logger = logger;
+
+            
         }
+
+
+
+        #region Logger
+        public void SetLogger(ILogger? logger)
+        {
+            _logger = logger;
+        }
+
+        #endregion Logger
+
+        #region Virtual Functions
         public virtual void OnTimerTick(object? state) { }
 
         // Add a virtual Start method
         public virtual void Start()
         {
 
-            IsRunning = true;
+            AddOrUpdateProperty("Running", true);
             // Default implementation does nothing
         }
 
         // Add a virtual Stop method
         public virtual void Stop()
         {
-            IsRunning = false;
+            AddOrUpdateProperty("Running", false);
             // Default implementation does nothing
         }
 
@@ -70,6 +101,11 @@ namespace BrickSchema.Net
             // Default implementation does nothing
             return 0;
         }
+
+        #endregion Virtual Functions
+
+
+
 
         public dynamic? AskAssociatedWith(params dynamic[] args) {  
             

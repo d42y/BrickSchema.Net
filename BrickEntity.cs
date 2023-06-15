@@ -21,6 +21,7 @@ namespace BrickSchema.Net
         public List<BrickShape> Shapes { get; set; }
 
         public Dictionary<string, string> RegisteredBehaviors { get; set; } //type, guid
+
         [JsonIgnore]
         public List<BrickBehavior> Behaviors { get; set; }
 
@@ -49,6 +50,7 @@ namespace BrickSchema.Net
             entities.AddRange(GetPointEntities().Except(entities));
             return entities;
         }
+
         public List<BrickEntity> GetFedEntitites()
         {
             var entities = OtherEntities
@@ -74,7 +76,7 @@ namespace BrickSchema.Net
         public List<Classes.Point> GetPointEntities()
         {
             var entities = OtherEntities
-            .Where(entity => entity.Relationships.Any(relationship => relationship.Type?.Equals(typeof(PointOf).Name) ?? false && relationship.ParentId == this.Id))
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(PointOf).Name) ?? false) && relationship.ParentId == this.Id))
             .ToList();
 
             List<Classes.Point> points = new List<Classes.Point>();
@@ -156,7 +158,6 @@ namespace BrickSchema.Net
 
         #region Properties
 
-
         public void AddOrUpdateProperty(string propertyName, dynamic propertyValue)
         {
             EntityProperty? property = Properties.FirstOrDefault(x => x.Name.Equals(propertyName));
@@ -172,6 +173,10 @@ namespace BrickSchema.Net
             }
         }
 
+        public void AddOrUpdateProperty(PropertiesEnum property, dynamic propertyValue)
+        {
+            AddOrUpdateProperty(property.ToString(), propertyValue);
+        }
         public T? GetProperty<T>(string propertyName)
         {
             EntityProperty? property = Properties.FirstOrDefault(x => x.Name.Equals(propertyName));
@@ -182,84 +187,11 @@ namespace BrickSchema.Net
             return default(T);
         }
 
-        public List<string> GetDefaultProperties()
+        public T? GetProperty<T>(PropertiesEnum property)
         {
-
-            return new List<string>() {
-
-                    "Aggregate",
-
-                    //area
-                    "Area",
-                    "GrossArea",
-                    "NetArea",
-                    "PanelArea",
-
-                    "Azimuth",
-
-                    "BuildingPrimaryFunction",
-
-                    //Conversion Efficiency
-                    "ConversionEfficiency",
-                    "MeasuredModuleConversionEfficiency",
-                    "RatedModuleconversionEfficiency",
-
-                    "CoolingCapacity",
-
-                    //Cordinates
-                    "Cordinates",
-                    "LatitudeCordinate",
-                    "LongitudeCordinate",
-                    "ElevationCordinate",
-
-                    "CurrentFlowtype",
-                    "RatedCurrentInput",
-                    "RatedMaximumCurrentInput",
-                    "RatedMinimumCurrentInput",
-                    "RatedCurrentOutput",
-                    "RatedMaximumCurrentOutput",
-                    "RatedMinimumCurrentOutput",
-
-                    "Deprecation",
-
-                    "ElectricalPhaseCount",
-                    "ElectricalPhases",
-                    "ElectricalPhaseA",
-                    "ElectricalPhaseB",
-                    "ElectricalPhaseC",
-
-                    "IsVirtualMeter",
-
-                    "LastKnownValue",
-
-                    "MeasuredPowerInput",
-                    "MeasuredPowerOutput",
-
-                    "OperationalStage",
-                    "OperationalStageCount",
-
-                    "PowerComplexity",
-                    "PowerFlow",
-                    "RatedPowerInput",
-                    "RatedPowerOutput",
-                    "RatedVoltageInput",
-                    "RatedVoltageOutput",
-
-                    "TemperatureCoefficientOfPmax",
-
-                    "ThermalTransmittance",
-                    "BuildingThermalTransmittance",
-
-                    "Tilt",
-
-                    "Volume",
-
-                    "YearBuilt",
-
-                    "Unit",
-                };
-
+            return GetProperty<T>(property.ToString());
         }
+
         #endregion Properties
 
 

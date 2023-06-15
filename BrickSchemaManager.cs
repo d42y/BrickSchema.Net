@@ -156,6 +156,33 @@ namespace BrickSchema.Net
             return null;
         }
 
+        public List<BrickEntity> GetEquipments()
+        {
+            List<BrickEntity> entities = new List<BrickEntity>();
+
+            foreach (var entity in _entities)
+            {
+                if (entity is Equipment)
+                {
+                    entities.Add(entity);
+                }
+            }
+
+            return entities;
+        }
+
+        public List<BrickBehavior> GetBehaviors(List<string> behaviorIds)
+        {
+            List<BrickBehavior> brickBehaviors = new List<BrickBehavior>();
+            foreach (var entity in _entities)
+            {
+                var e = entity as BrickEntity;
+                brickBehaviors.AddRange(e?.Behaviors.Where(x => behaviorIds.Contains(x.Id) || behaviorIds.Count == 0)??new List<BrickBehavior>());
+            }
+
+            return brickBehaviors;
+        }
+        
         //public List<BrickEntity> GetRootEntities()
         //{
         //    var entities = _entities

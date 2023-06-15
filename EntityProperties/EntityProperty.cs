@@ -39,6 +39,8 @@ namespace BrickSchema.Net.EntityProperties
             this.Value = value;
         }
 
+        
+
         public T? GetValue<T> ()
         {
             if (Type == null) return default(T);
