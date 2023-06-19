@@ -13,7 +13,7 @@ using BrickSchema.Net.Classes.Equipments.HVACType.TerminalUnits;
 using BrickSchema.Net.Classes.Locations;
 using BrickSchema.Net.Classes.Measureable;
 using BrickSchema.Net.Classes.Points;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+
 
 namespace BrickSchema.Net
 {
@@ -156,7 +156,7 @@ namespace BrickSchema.Net
             return null;
         }
 
-        public List<BrickEntity> GetEquipments()
+        public List<BrickEntity> GetEquipments(List<string> equipmentIds)
         {
             List<BrickEntity> entities = new List<BrickEntity>();
 
@@ -168,6 +168,10 @@ namespace BrickSchema.Net
                 }
             }
 
+            if (equipmentIds.Count > 0)
+            {
+                entities = entities.Where(x => equipmentIds.Contains(x.Id)).ToList();
+            }
             return entities;
         }
 
@@ -182,7 +186,21 @@ namespace BrickSchema.Net
 
             return brickBehaviors;
         }
-        
+
+        public List<BrickBehavior> GetEquipmentBehaviors(string equipmentId)
+        {
+            var equipments = GetEquipments(new() { equipmentId });
+
+            List<BrickBehavior> brickBehaviors = new();
+            foreach (var entity in equipments)
+            {
+                var e = entity as BrickEntity;
+                brickBehaviors.AddRange(e?.Behaviors ?? new List<BrickBehavior>());
+            }
+
+            return brickBehaviors;
+        }
+
         //public List<BrickEntity> GetRootEntities()
         //{
         //    var entities = _entities

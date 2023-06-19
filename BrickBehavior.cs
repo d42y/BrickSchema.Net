@@ -1,5 +1,4 @@
-﻿using BrickSchema.Net.Relationships;
-using Microsoft.EntityFrameworkCore.Query;
+﻿using BrickSchema.Net.EntityProperties;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,26 +10,77 @@ namespace BrickSchema.Net
 {
     public class BrickBehavior : BrickEntity
     {
+
+        
+        
+
+        #region Private properties
+        private Thread _executionThread;
+        private bool _executing = false;
+        #endregion private properties
+
+        #region Protected properties
+        protected CancellationTokenSource CancelToken;
         protected ILogger? _logger;
-        public string Name { get { return GetProperty<string>("Name")??string.Empty; } }
-        protected bool IsRunning { get { return GetProperty<bool>("Running"); } }
-        protected int PollRate
+        protected bool IsRunning { get { return GetProperty<bool>(PropertiesEnum.Running); } }
+
+        
+
+        protected DateTime LastRun = DateTime.Now;
+        protected bool Processing = false;
+
+        protected Dictionary<string, DateTime> Errors = new Dictionary<string, DateTime>();
+
+        #endregion protected properties
+
+        #region Public properties
+        public string BehaviorType { 
+            get { return GetProperty<string>(PropertiesEnum.BehaviorType) ?? string.Empty; }
+            set { AddOrUpdateProperty(PropertiesEnum.Name, value); }
+        }
+
+        public string Name { get { return GetProperty<string>(PropertiesEnum.Name)??string.Empty; } }
+        public string Description { get { return GetProperty<string>(PropertiesEnum.Description) ?? string.Empty; } }
+        public string Insight { get { return GetProperty<string>(PropertiesEnum.Insight) ?? string.Empty; } }
+        public string Resolution { get { return GetProperty<string>(PropertiesEnum.Resoltuion) ?? string.Empty; } }
+        public DateTime LastExecutionStart 
+        { 
+            get 
+            { 
+                var d = GetProperty<DateTime>(PropertiesEnum.LastExecutionStart);
+                if (d == null)
+                {
+                    d = DateTime.Now;
+                    AddOrUpdateProperty(PropertiesEnum.LastExecutionStart, d);
+                }
+                return d;  
+            } 
+        }
+        public DateTime LastExecutionEnd
         {
             get
             {
-                return GetProperty<int>("PollRate");
+                var d = GetProperty<DateTime>(PropertiesEnum.LastExecutionEnd);
+                if (d == null)
+                {
+                    d = DateTime.Now;
+                    AddOrUpdateProperty(PropertiesEnum.LastExecutionEnd, d);
+                }
+                return d;
             }
-
-            set
-            {
-                AddOrUpdateProperty("PoolRate", value);
-            }
-
         }
-        public BrickEntity? Parent { get; set; } = null;
-        protected Timer? BehaviorTimer { get; set; } = null;
 
-        protected Dictionary<string, DateTime> Errors = new Dictionary<string, DateTime>();
+        public double Weight
+        {
+            get
+            {
+                var w = GetProperty<double>(PropertiesEnum.Weight);
+                return w == 0 ? 1: w;
+            }
+        }
+
+        public BrickEntity? Parent = null;
+        #endregion public properties
 
         protected bool NotifyError(string error)
         {
@@ -50,6 +100,8 @@ namespace BrickSchema.Net
                 Errors.Add(error, DateTime.Now);
             }
 
+            AddOrUpdateProperty(PropertiesEnum.Errors, Errors);
+            AddOrUpdateProperty(PropertiesEnum.HasError, true);
             return answer;
         }
 
@@ -57,15 +109,19 @@ namespace BrickSchema.Net
         protected void ClearErrors()
         {
             Errors.Clear();
+            AddOrUpdateProperty(PropertiesEnum.HasError, false);
         }
-        public BrickBehavior(string name, string type, ILogger? logger = null)
-        {
-            AddOrUpdateProperty("Name", name);
-            AddOrUpdateProperty("Running", false);
-            Type = type;
-            _logger = logger;
 
-            
+        public BrickBehavior( string entityType, string behaviorType, string behaviorName, double weight, ILogger? logger = null)
+        {
+            AddOrUpdateProperty(PropertiesEnum.Name, behaviorName);
+            AddOrUpdateProperty(PropertiesEnum.Running, false);
+            AddOrUpdateProperty(PropertiesEnum.Weight, weight);
+            Type = entityType;
+            BehaviorType = behaviorType;
+            _logger = logger;
+            _executing = false;
+            _executionThread = new Thread(Execute);
         }
 
 
@@ -78,29 +134,65 @@ namespace BrickSchema.Net
 
         #endregion Logger
 
-        #region Virtual Functions
-        public virtual void OnTimerTick(object? state) { }
+        #region CallBack
+        public void OnTimerTick()
+        {
+            if (!_executing && IsRunning && !_executionThread.IsAlive)
+            {
+                _executing = true;
+                AddOrUpdateProperty(PropertiesEnum.LastExecutionStart, DateTime.Now);
+                try
+                {
+                    CancelToken = new CancellationTokenSource();
+                    _executionThread.Start();
+                    _executionThread.Join();
+                    AddOrUpdateProperty(PropertiesEnum.ExecutionReturnCode, 0);
+                } catch (Exception ex)
+                {
+                    AddOrUpdateProperty(PropertiesEnum.ExecutionReturnCode, 100);
+                    AddOrUpdateProperty(PropertiesEnum.ExecutionExceptionMessage, ex.Message);
+                }
+                AddOrUpdateProperty(PropertiesEnum.LastExecutionEnd, DateTime.Now);
+                _executing = false;
+            }
+        }
 
-        // Add a virtual Start method
-        public virtual void Start()
+        public void Start()
         {
 
-            AddOrUpdateProperty("Running", true);
+            AddOrUpdateProperty(PropertiesEnum.Running, true);
+            Load();
             // Default implementation does nothing
         }
 
         // Add a virtual Stop method
-        public virtual void Stop()
+        public void Stop()
         {
-            AddOrUpdateProperty("Running", false);
+            AddOrUpdateProperty(PropertiesEnum.Running, false);
+            CancelToken?.Cancel();
+            Unload();
             // Default implementation does nothing
+        }
+        #endregion callback
+
+        #region Virtual Functions
+
+
+        // Add a virtual Start method
+
+        
+        protected virtual void Execute()
+        {
+            // Default implementation does nothing
+      
         }
 
-        public virtual dynamic? Execute(params dynamic[] args)
+        protected virtual void Load()
         {
-            // Default implementation does nothing
-            return 0;
+
         }
+
+        protected virtual void Unload() { }
 
         #endregion Virtual Functions
 

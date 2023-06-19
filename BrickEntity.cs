@@ -2,7 +2,6 @@
 using BrickSchema.Net.EntityProperties;
 using BrickSchema.Net.Relationships;
 using BrickSchema.Net.Shapes;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Newtonsoft.Json;
 using System.Drawing;
 
@@ -158,7 +157,7 @@ namespace BrickSchema.Net
 
         #region Properties
 
-        public void AddOrUpdateProperty(string propertyName, dynamic propertyValue)
+        public void AddOrUpdateProperty<T>(string propertyName, T propertyValue)
         {
             EntityProperty? property = Properties.FirstOrDefault(x => x.Name.Equals(propertyName));
             if (property == null)
@@ -173,7 +172,7 @@ namespace BrickSchema.Net
             }
         }
 
-        public void AddOrUpdateProperty(PropertiesEnum property, dynamic propertyValue)
+        public void AddOrUpdateProperty<T>(PropertiesEnum property, T propertyValue)
         {
             AddOrUpdateProperty(property.ToString(), propertyValue);
         }
@@ -184,7 +183,7 @@ namespace BrickSchema.Net
             {
                 return property.GetValue<T>();
             }
-            return default(T);
+            return default(T?);
         }
 
         public T? GetProperty<T>(PropertiesEnum property)

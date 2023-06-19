@@ -18,13 +18,22 @@ namespace BrickSchema.Net.EntityProperties
         Running = 101,
         Insight = 102,
         Resoltuion = 103,
+        ExecutionReturnCode,
+        ExecutionExceptionMessage,
+        LastExecutionStart,
+        LastExecutionEnd,
+        BehaviorType,
+        Errors,
+        HasError,
+
 
         //analytics
         Conformance = 200,
-        
+        Deviation,
+        Weight,
 
 
-        Aggregate= 300,
+        Aggregate = 300,
 
         //area
         Area = 400,

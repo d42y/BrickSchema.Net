@@ -1,28 +1,25 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BrickSchema.Net.EntityProperties
 {
     public class EntityProperty
     {
         public string Id { get; set; }
-        public string? Type { get; private set; }
-        public string Name { get; private set; }
-        public dynamic Value { get; private set; }
+        public string? Type { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
 
         public EntityProperty()
         {
             Id = Guid.NewGuid().ToString();
             Type = null;
-
+            Name = string.Empty;
+            
         }
 
         [JsonConstructor]
-        public EntityProperty(string id, string type, string name, dynamic value)
+        public EntityProperty(string id, string type, string name, string value)
         {
             Id = id;
             Type = type;
@@ -31,12 +28,15 @@ namespace BrickSchema.Net.EntityProperties
 
         }
 
-        public void SetValue (string name, dynamic value)
+        public void SetValue<T> (string name, T value)
         {
-            
-            this.Type = value.GetType().Name;
-            this.Name = name;
-            this.Value = value;
+            if (value == null) { throw new ArgumentNullException("value"); }
+            try
+            {
+                this.Type = value?.GetType().Name;
+                this.Name = name;
+                this.Value = JsonConvert.SerializeObject(value);
+            } catch (Exception ex) { throw new Exception(ex.Message, ex); }
         }
 
         
@@ -44,13 +44,12 @@ namespace BrickSchema.Net.EntityProperties
         public T? GetValue<T> ()
         {
             if (Type == null) return default(T);
-            switch (this.Type)
+            if (!Type.Equals(typeof(T).Name)) throw new InvalidCastException($"Cannot convert {Type} to {typeof(T).Name}.");
+            try
             {
-                default:
-                    return (T)this.Value;
-                    
-            }
-            
+                T? deserializedObject = JsonConvert.DeserializeObject<T>(this.Value);
+                return deserializedObject;
+            } catch (Exception ex) { throw new InvalidCastException($"Cannot convert {Type} to {typeof(T).Name}. {ex.Message}"); }
         }
 
 
