@@ -201,13 +201,8 @@ namespace BrickSchema.Net
             return brickBehaviors;
         }
 
-        //public List<BrickEntity> GetRootEntities()
-        //{
-        //    var entities = _entities
-        //    .Where(entity => entity.Relationships.Any(relationship => string.IsNullOrEmpty(relationship.ParentId)))
-        //    .ToList();
-        //    return entities;
-        //}
+        //tenant
+        public Tenant AddTenant(string? id = null) => AddEntity<Tenant>(id);
 
         //add classes
         //Collection

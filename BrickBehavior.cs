@@ -47,26 +47,26 @@ namespace BrickSchema.Net
         { 
             get 
             { 
-                var d = GetProperty<DateTime>(PropertiesEnum.LastExecutionStart);
+                var d = GetProperty<DateTime?>(PropertiesEnum.LastExecutionStart);
                 if (d == null)
                 {
                     d = DateTime.Now;
                     AddOrUpdateProperty(PropertiesEnum.LastExecutionStart, d);
                 }
-                return d;  
+                return (DateTime)d;  
             } 
         }
         public DateTime LastExecutionEnd
         {
             get
             {
-                var d = GetProperty<DateTime>(PropertiesEnum.LastExecutionEnd);
+                var d = GetProperty<DateTime?>(PropertiesEnum.LastExecutionEnd);
                 if (d == null)
                 {
                     d = DateTime.Now;
                     AddOrUpdateProperty(PropertiesEnum.LastExecutionEnd, d);
                 }
-                return d;
+                return (DateTime)d;
             }
         }
 
@@ -144,6 +144,7 @@ namespace BrickSchema.Net
                 try
                 {
                     CancelToken = new CancellationTokenSource();
+                    _executionThread = new Thread(Execute);
                     _executionThread.Start();
                     _executionThread.Join();
                     AddOrUpdateProperty(PropertiesEnum.ExecutionReturnCode, 0);

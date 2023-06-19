@@ -183,6 +183,7 @@ namespace BrickSchema.Net
             {
                 return property.GetValue<T>();
             }
+            
             return default(T?);
         }
 
