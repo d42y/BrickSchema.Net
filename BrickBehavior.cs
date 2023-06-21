@@ -111,11 +111,11 @@ namespace BrickSchema.Net
             AddOrUpdateProperty(PropertiesEnum.HasError, false);
         }
 
-        public BrickBehavior( string entityType, string behaviorType, string behaviorName, double weight, ILogger? logger = null)
+        public BrickBehavior( string entityType, string behaviorType, string behaviorName, ILogger? logger = null)
         {
             AddOrUpdateProperty(PropertiesEnum.Name, behaviorName);
             AddOrUpdateProperty(PropertiesEnum.Running, false);
-            AddOrUpdateProperty(PropertiesEnum.Weight, weight);
+            AddOrUpdateProperty(PropertiesEnum.Weight, 1); //to do
             Type = entityType;
             AddOrUpdateProperty(PropertiesEnum.BehaviorType, behaviorType);
             _logger = logger;

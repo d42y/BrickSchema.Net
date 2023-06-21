@@ -12,7 +12,7 @@ namespace BrickSchema.Net
 {
     public static class BrickSchemaUtility
     {
-        public static List<dynamic> ImportBrickSchema(string jsonLdFilePath)
+        public static List<BrickEntity> ImportBrickSchema(string jsonLdFilePath)
         {
 
 
@@ -22,10 +22,10 @@ namespace BrickSchema.Net
                 json = File.ReadAllText(jsonLdFilePath);
             }
             var settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Newtonsoft.Json.Formatting.Indented };
-            return JsonConvert.DeserializeObject<List<dynamic>>(json, settings)??new();
+            return JsonConvert.DeserializeObject<List<BrickEntity>>(json, settings)??new();
         }
 
-        public static void ExportBrickSchema(List<dynamic> entities, string jsonLdFilePath)
+        public static void ExportBrickSchema(List<BrickEntity> entities, string jsonLdFilePath)
         {
             
             var settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Newtonsoft.Json.Formatting.Indented };

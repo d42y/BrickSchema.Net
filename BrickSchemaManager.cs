@@ -19,18 +19,18 @@ namespace BrickSchema.Net
 {
     public class BrickSchemaManager
     {
-        private List<dynamic> _entities;
+        private List<BrickEntity> _entities;
         private readonly string? _brickPath;
 
 
         public BrickSchemaManager()
         {
-            _entities = new List<dynamic>();
+            _entities = new List<BrickEntity>();
         }
 
         public BrickSchemaManager(string brickFilePath)
         {
-            _entities = new List<dynamic>();
+            _entities = new List<BrickEntity>();
             _brickPath = brickFilePath;
             LoadSchema(_brickPath);
         }
@@ -103,7 +103,7 @@ namespace BrickSchema.Net
             if (!string.IsNullOrEmpty(id))
             {
                 var existingEntity = _entities.FirstOrDefault(x => x.Id.Equals(id));
-                if (existingEntity != null) return existingEntity;
+                if (existingEntity != null) return (T)existingEntity;
             }
             T entity = new T
             {
@@ -126,25 +126,15 @@ namespace BrickSchema.Net
 
         public T AddEntity<T>(string? id) where T : BrickEntity, new()
         {
-            if (!string.IsNullOrEmpty(id))
+            T entity;
+            if (id == null)
             {
-               
-                
-                var existingEntity = _entities.FirstOrDefault(x=>x.Id.Equals(id));
-                if (existingEntity != null) return existingEntity;
+                entity = AddEntity<T>();
             }
-            T entity = new T
+            else
             {
-                Id = id??Guid.NewGuid().ToString(),
-                Type = typeof(T).Name
-            };
-
-            foreach (var _e in _entities)
-            {
-                entity.OtherEntities.Add(_e);
+                entity = AddEntity<T>(id, "");
             }
-
-            _entities.Add(entity);
             return entity;
         }
 
