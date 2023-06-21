@@ -98,6 +98,32 @@ namespace BrickSchema.Net
             return false;
         }
 
+        public T AddEntity<T>(string id, string name) where T : BrickEntity, new()
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                var existingEntity = _entities.FirstOrDefault(x => x.Id.Equals(id));
+                if (existingEntity != null) return existingEntity;
+            }
+            T entity = new T
+            {
+                Id = id ?? Guid.NewGuid().ToString(),
+                Type = typeof(T).Name
+                
+            };
+            entity.AddOrUpdateProperty(EntityProperties.PropertiesEnum.Name, name);
+
+            foreach (var _e in _entities)
+            {
+                //entity.OtherEntities.Add(_e);
+                var e = _e as BrickEntity;
+                e.OtherEntities.Add(entity);
+            }
+            entity.OtherEntities = new List<BrickEntity>(_entities);
+            _entities.Add(entity);
+            return entity;
+        }
+
         public T AddEntity<T>(string? id) where T : BrickEntity, new()
         {
             if (!string.IsNullOrEmpty(id))

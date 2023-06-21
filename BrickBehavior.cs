@@ -36,7 +36,6 @@ namespace BrickSchema.Net
         #region Public properties
         public string BehaviorType { 
             get { return GetProperty<string>(PropertiesEnum.BehaviorType) ?? string.Empty; }
-            set { AddOrUpdateProperty(PropertiesEnum.Name, value); }
         }
 
         public string Name { get { return GetProperty<string>(PropertiesEnum.Name)??string.Empty; } }
@@ -118,7 +117,7 @@ namespace BrickSchema.Net
             AddOrUpdateProperty(PropertiesEnum.Running, false);
             AddOrUpdateProperty(PropertiesEnum.Weight, weight);
             Type = entityType;
-            BehaviorType = behaviorType;
+            AddOrUpdateProperty(PropertiesEnum.BehaviorType, behaviorType);
             _logger = logger;
             _executing = false;
             _executionThread = new Thread(Execute);

@@ -159,7 +159,22 @@ namespace BrickSchema.Net
 
         public void AddOrUpdateProperty<T>(string propertyName, T propertyValue)
         {
-            EntityProperty? property = Properties.FirstOrDefault(x => x.Name.Equals(propertyName));
+            var properties = Properties.Where(x => x.Name.Equals(propertyName)).ToList();
+            EntityProperty? property = null;
+            if (properties.Count > 1)
+            {
+                foreach (var p in properties.ToArray())
+                {
+                    Properties.Remove(p);
+                    break;
+                }
+                property = Properties.FirstOrDefault(x => x.Name.Equals(propertyName));
+            }
+            else
+            {
+                property = properties.FirstOrDefault();
+            }
+            
             if (property == null)
             {
                 property = new EntityProperty();
