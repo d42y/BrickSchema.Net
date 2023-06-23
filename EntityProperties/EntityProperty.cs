@@ -46,12 +46,13 @@ namespace BrickSchema.Net.EntityProperties
             if (Type == null) return default(T);
 
             string tName = GetTypeName<T>();
-            if (!Type.Equals(tName)) throw new InvalidCastException($"Cannot convert {Type} to {tName}.");
+            //if (!Type.Equals(tName)) throw new InvalidCastException($"Cannot convert {Type} to {tName}.");
             try
             {
                 T? deserializedObject = JsonConvert.DeserializeObject<T>(this.Value);
                 return deserializedObject;
-            } catch (Exception ex) { throw new InvalidCastException($"Cannot convert {Type} to {tName}. {ex.Message}"); }
+            } catch (Exception ex) { /* throw new InvalidCastException($"Cannot convert {Type} to {tName}. {ex.Message}");*/ }
+            return default(T?);
         }
 
         private string GetTypeName<T>()

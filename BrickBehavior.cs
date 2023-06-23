@@ -142,15 +142,17 @@ namespace BrickSchema.Net
                 AddOrUpdateProperty(PropertiesEnum.LastExecutionStart, DateTime.Now);
                 try
                 {
-                    CancelToken = new CancellationTokenSource();
-                    _executionThread = new Thread(Execute);
-                    _executionThread.Start();
-                    _executionThread.Join();
+                    //CancelToken = new CancellationTokenSource();
+                    //_executionThread = new Thread(Execute);
+                    //_executionThread.Start();
+                    //_executionThread.Join();
+                    Execute();
                     AddOrUpdateProperty(PropertiesEnum.ExecutionReturnCode, 0);
                 } catch (Exception ex)
                 {
                     AddOrUpdateProperty(PropertiesEnum.ExecutionReturnCode, 100);
                     AddOrUpdateProperty(PropertiesEnum.ExecutionExceptionMessage, ex.Message);
+                    _logger?.LogError(ex, $"Bahavior OnTimerTick: Excpetion: {ex.Message}");
                 }
                 AddOrUpdateProperty(PropertiesEnum.LastExecutionEnd, DateTime.Now);
                 _executing = false;
