@@ -217,6 +217,19 @@ namespace BrickSchema.Net
             return brickBehaviors;
         }
 
+        public Dictionary<string,string> GetRegisteredEquipmentBehaviors(string equipmentId)
+        {
+            var equipments = GetEquipments(new() { equipmentId });
+
+            Dictionary<string, string> registeredBrickBehaviors = new();
+            foreach (var entity in equipments)
+            {
+                var e = entity as BrickEntity;
+                registeredBrickBehaviors = (e?.RegisteredBehaviors ?? new Dictionary<string, string>());
+            }
+            return registeredBrickBehaviors;
+        }
+
         //tenant
         public Tenant AddTenant(string? id = null) => AddEntity<Tenant>(id);
 

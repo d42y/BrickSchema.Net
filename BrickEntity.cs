@@ -109,6 +109,30 @@ namespace BrickSchema.Net
             return points;
         }
 
+        public Classes.Point? GetPointEntity(string tagName)
+        {
+            var entities = OtherEntities
+            .Where(entity => entity.Relationships.Any(relationship => (relationship.Type?.Equals(typeof(PointOf).Name) ?? false) && relationship.ParentId == this.Id))
+            .ToList();
+
+            foreach (var entity in entities)
+            {
+                var foundTags = entity.GetTags();
+                foreach (var tag in foundTags)
+                {
+                    if (tag.Name.Equals(tagName))
+                    {
+                        if (entity is Classes.Point)
+                        {
+                            return entity as Classes.Point;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public List<Tag> GetTags()
         {
             var tags = OtherEntities
@@ -547,16 +571,18 @@ namespace BrickSchema.Net
         {
            
             var behaviors = GetBehaviors(behavior.Type);
-            if (behaviors.Count > 1)
+            if (behaviors.Count >= 1)
             {
-                RemoveBehavior(behavior.Type);
-                
-                
+                for (int i = 0; i < behaviors.Count - 1; i++)
+                {
+                    RemoveBehavior(behaviors[i]);
+                }
+                var foundBehavior = behaviors[behaviors.Count - 1];
+                if (foundBehavior.Parent == null) foundBehavior.Parent = this;
+                return foundBehavior;
+
             }
-            else if (behaviors.Count == 1)
-            {
-                return behaviors[0];
-            }
+            
 
             if (RegisteredBehaviors.ContainsKey(behavior.Type))
             {
@@ -580,6 +606,11 @@ namespace BrickSchema.Net
                 behavior.Stop();
                 Behaviors.Remove(behavior);
             }
+        }
+
+        public void RemoveBehavior(BrickBehavior behavior)
+        {
+            Behaviors.Remove(behavior);
         }
 
         public List<BrickBehavior> GetBehaviors()

@@ -12,6 +12,9 @@ namespace BrickSchema.Net.EntityProperties
         //Genral
         Name = 0,
         Description = 1,
+        Value,
+        Timestamp,
+        ValueQuality,
 
         //behavior
         PollRate = 100,

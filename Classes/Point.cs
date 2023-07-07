@@ -9,9 +9,42 @@ namespace BrickSchema.Net.Classes
     {
         
 
-        public double? Value { get; private set; } = null;
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public PointValueQuality Quality { get; set;  } = PointValueQuality.Unknown;
+        public double? Value
+        {
+            get
+            {
+                return GetProperty<double>(EntityProperties.PropertiesEnum.Value);
+            }
+            private set
+            {
+                if (Value != value)
+                {
+                    AddOrUpdateProperty(EntityProperties.PropertiesEnum.Value, value);
+                    NotifyValueChange();
+                }
+            }
+        }
+        public DateTime Timestamp
+        {
+            get
+            {
+                return GetProperty<DateTime>(EntityProperties.PropertiesEnum.Timestamp);
+            }
+            private set
+            {
+                AddOrUpdateProperty(EntityProperties.PropertiesEnum.Timestamp, value);
+            }
+        }
+        public PointValueQuality Quality {
+            get
+            {
+                return GetProperty<PointValueQuality>(EntityProperties.PropertiesEnum.ValueQuality);
+            }
+            private set
+            {
+                AddOrUpdateProperty(EntityProperties.PropertiesEnum.ValueQuality, value);
+            }
+        } 
 
 
         public void UpdateValue(double? value, DateTime timestamp, PointValueQuality valueQuality = PointValueQuality.Good)
@@ -19,7 +52,7 @@ namespace BrickSchema.Net.Classes
             Value = value;
             Timestamp = timestamp;
             Quality = valueQuality;
-            NotifyValueChange();
+            
         }
 
         public Point ClonePoint()
