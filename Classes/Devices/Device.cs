@@ -10,6 +10,7 @@ namespace BrickSchema.Net.Classes.Devices
     {
         public string? Address { get; set; }
         
+        
     }
 
     public class BACnetDevice : Device {

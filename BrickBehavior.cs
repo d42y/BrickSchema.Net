@@ -15,11 +15,12 @@ namespace BrickSchema.Net
 
         
         #region Private properties
-        private Thread _executionThread;
+        private Thread? _executionThread;
         private bool _executing = false;
         private bool _executeByTimer = true;
         private bool _isTaskRunning = false;
         private bool _isAnalyticsRunning = false;
+        private bool _isInfoRunning = false;
         private bool _isDescriptionRunning = false;
         private bool _isInsightRunning = false;
         private bool _isResolutionRunning = false;
@@ -29,7 +30,7 @@ namespace BrickSchema.Net
         #region Protected properties
         protected ILogger? _logger;
         
-        protected CancellationTokenSource CancelToken;
+        protected CancellationTokenSource? CancelToken;
 
 
         protected DateTime LastRun = DateTime.Now;
@@ -45,11 +46,12 @@ namespace BrickSchema.Net
             get { return GetProperty<bool>(PropertiesEnum.Running); }
             protected set { AddOrUpdateProperty(PropertiesEnum.Running, value); }
         }
-        public string BehaviorType { 
-            get { return GetProperty<string>(PropertiesEnum.BehaviorType) ?? string.Empty; }
+        public string BehaviorMode { 
+            get { return GetProperty<string>(PropertiesEnum.BehaviorMode) ?? string.Empty; }
         }
 
         public string Name { get { return GetProperty<string>(PropertiesEnum.Name)??string.Empty; } }
+
         public string Description { 
             get { return GetProperty<string>(PropertiesEnum.Description) ?? string.Empty; } 
             protected set { AddOrUpdateProperty(PropertiesEnum.Description, value); }
@@ -61,6 +63,12 @@ namespace BrickSchema.Net
         public string Resolution { 
             get { return GetProperty<string>(PropertiesEnum.Resoltuion) ?? string.Empty; }
             protected set { AddOrUpdateProperty(PropertiesEnum.Resoltuion, value); }
+        }
+
+        public string Info
+        {
+            get { return GetProperty<string>(PropertiesEnum.Info) ?? string.Empty; }
+            protected set { AddOrUpdateProperty(PropertiesEnum.Info, value); }
         }
         public DateTime LastExecutionStart 
         { 
@@ -131,13 +139,18 @@ namespace BrickSchema.Net
             AddOrUpdateProperty(PropertiesEnum.HasError, false);
         }
 
-        public BrickBehavior(string behaviorType, string behaviorName, ILogger? logger = null)
+        private BrickBehavior(BrickEntity entity):base(entity) //this is for cloning only
+        {
+
+        } 
+
+        public BrickBehavior(string behaviorMode, string behaviorName, ILogger? logger = null)
         {
             AddOrUpdateProperty(PropertiesEnum.Name, behaviorName);
             AddOrUpdateProperty(PropertiesEnum.Running, false);
             AddOrUpdateProperty(PropertiesEnum.Weight, 1); //to do
             Type = this.GetType().Name;
-            AddOrUpdateProperty(PropertiesEnum.BehaviorType, behaviorType);
+            AddOrUpdateProperty(PropertiesEnum.BehaviorMode, behaviorMode);
             _logger = logger;
             _executing = false;
             _executionThread = new Thread(Execute);
@@ -160,17 +173,11 @@ namespace BrickSchema.Net
 
 
         #region public functions
-        public BrickBehavior CloneSelfOnly()
+        public override BrickBehavior Clone()
         {
-            BrickBehavior behavior = new(BehaviorType, Name);
-            behavior.Id = Id;
-            behavior.Properties = Properties;
-            behavior.Type = Type;
-            behavior.Relationships = Relationships;
-            behavior.Behaviors = Behaviors;
-            behavior.Shapes = Shapes;
-
-            return behavior;
+            var clone = new BrickBehavior(base.Clone());
+            clone.Parent = Parent?.Clone();
+            return clone;
         }
 
         
@@ -250,21 +257,43 @@ namespace BrickSchema.Net
                         _isAnalyticsRunning = true;
                         try
                         {
-                            var analyticsReturnCode = ProcessAnalytics();
+                            var returnCode = ProcessAnalytics();
+                            if (returnCode == BehaviorReturnCodes.Good)
+                            {
+                                
+                            }
                         }
                         catch { }
                         _isAnalyticsRunning = false;
+                    }
+                    if (!_isInfoRunning)
+                    {
+                        _isInfoRunning = true;
+                        try
+                        {
+                            var returnCode = GenerateDescription(out string info);
+                            Info = string.Empty;
+                            if (returnCode != BehaviorReturnCodes.Good)
+                            {
+                                Info = $"**** {DateTime.Now.ToLongDateString()} Execution Result {returnCode.ToString()} **** \n\r\n\r";
+                            }
+                            Info += info;
+                        }
+                        catch { }
+                        _isInfoRunning = false;
                     }
                     if (!_isDescriptionRunning)
                     {
                         _isDescriptionRunning = true;
                         try
                         {
-                            var descriptionReturnCode = GenerateDescription(out string description);
-                            if (descriptionReturnCode == BehaviorReturnCodes.Good)
+                            var returnCode = GenerateDescription(out string description);
+                            Description = string.Empty;
+                            if (returnCode != BehaviorReturnCodes.Good)
                             {
-                                Description = description;
+                                Description = $"**** {DateTime.Now.ToLongDateString()} Execution Result {returnCode.ToString()} **** \n\r\n\r";
                             }
+                            Description += description;
                         }
                         catch { }
                         _isDescriptionRunning = false;
@@ -274,11 +303,13 @@ namespace BrickSchema.Net
                         _isInsightRunning = true;
                         try
                         {
-                            var insightReturnCode = GenerateInsight(out string insight);
-                            if (insightReturnCode == BehaviorReturnCodes.Good)
+                            var returnCode = GenerateInsight(out string insight);
+                            Insight = string.Empty;
+                            if (returnCode != BehaviorReturnCodes.Good)
                             {
-                                Insight = insight;
+                                Insight = $"**** {DateTime.Now.ToLongDateString()} Execution Result {returnCode.ToString()} **** \n\r\n\r";
                             }
+                            Insight += insight;
                         }
                         catch { }
                         _isInsightRunning = false;
@@ -288,11 +319,13 @@ namespace BrickSchema.Net
                         _isResolutionRunning = true;
                         try
                         {
-                            var resolutionReturnCode = GenerateResolution(out string resolution);
-                            if (resolutionReturnCode == BehaviorReturnCodes.Good)
+                            var returnCode = GenerateResolution(out string resolution);
+                            Resolution = string.Empty;
+                            if (returnCode != BehaviorReturnCodes.Good)
                             {
-                                Resolution = resolution;
+                                Resolution = $"**** {DateTime.Now.ToLongDateString()} Execution Result {returnCode.ToString()} **** \n\r\n\r";
                             }
+                            Resolution += resolution;
                         }
                         catch { };
                         _isResolutionRunning = false;
@@ -311,6 +344,11 @@ namespace BrickSchema.Net
         }
         protected virtual BehaviorReturnCodes ProcessTask() { return BehaviorReturnCodes.NotImplemented; }
         protected virtual BehaviorReturnCodes ProcessAnalytics( ) { return BehaviorReturnCodes.NotImplemented; }
+        protected virtual BehaviorReturnCodes GenerateInfo(out string info)
+        {
+            info = "Not Implimented.";
+            return BehaviorReturnCodes.NotImplemented;
+        }
         protected virtual BehaviorReturnCodes GenerateDescription(out string description)
         {
             description = "Not Implimented.";

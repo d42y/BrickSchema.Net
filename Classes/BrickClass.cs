@@ -12,6 +12,10 @@ namespace BrickSchema.Net.Classes
             OnValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        public BrickClass() { }
+
+        public BrickClass(BrickEntity entity) : base(entity) { }
+
         public string Name
         {
             get { return GetProperty<string>(EntityProperties.PropertiesEnum.Name) ?? string.Empty; }
@@ -26,15 +30,10 @@ namespace BrickSchema.Net.Classes
             set { AddOrUpdateProperty(EntityProperties.PropertiesEnum.Description, value); }
         }
 
-        public BrickClass CloneIdentity()
+        public override BrickClass Clone()
         {
-            BrickClass point = new BrickClass();
-            point.Id = Id;
-            point.Type = Type;
-            point.Name = Name;
-            point.Description = Description;
-
-            return point;
+            var clone = new BrickClass(base.Clone());
+            return clone;
         }
 
         

@@ -8,6 +8,10 @@ namespace BrickSchema.Net
 {
     public class BrickShape : BrickEntity
     {
-
+        public override BrickShape Clone()
+        {
+            var clone = (BrickShape)base.Clone();
+            return clone;
+        }
     }
 }

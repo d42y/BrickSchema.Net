@@ -12,20 +12,23 @@ namespace BrickSchema.Net.EntityProperties
         //Genral
         Name = 0,
         Description = 1,
+        Info,
         Value,
         Timestamp,
         ValueQuality,
 
         //behavior
         PollRate = 100,
-        Running = 101,
-        Insight = 102,
-        Resoltuion = 103,
+        Runable,
+        Running,
+        Insight,
+        Resoltuion,
         ExecutionReturnCode,
         ExecutionExceptionMessage,
         LastExecutionStart,
         LastExecutionEnd,
         BehaviorType,
+        BehaviorMode,
         Errors,
         HasError,
 

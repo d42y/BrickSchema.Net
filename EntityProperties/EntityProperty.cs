@@ -10,6 +10,15 @@ namespace BrickSchema.Net.EntityProperties
         public string Name { get; set; }
         public string Value { get; set; }
 
+        public EntityProperty Clone()
+        {
+            var clone = new EntityProperty();
+            clone.Id = Id;
+            clone.Type = Type;
+            clone.Name = Name;
+            clone.Value = Value;
+            return clone;
+        }
         public EntityProperty()
         {
             Id = Guid.NewGuid().ToString();
@@ -30,13 +39,13 @@ namespace BrickSchema.Net.EntityProperties
 
         public void SetValue<T> (string name, T value)
         {
-            if (value == null) { throw new ArgumentNullException("value"); }
+            if (value == null) { Console.WriteLine($"Property Set Value [{name}:null]"); return; }
             try
             {
                 this.Type = GetTypeName<T>();
                 this.Name = name;
                 this.Value = JsonConvert.SerializeObject(value);
-            } catch (Exception ex) { throw new Exception(ex.Message, ex); }
+            } catch (Exception ex) { Console.WriteLine($"Property Set Value [{name}:{ex.Message}]"); }
         }
 
         

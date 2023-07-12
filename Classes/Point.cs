@@ -57,7 +57,7 @@ namespace BrickSchema.Net.Classes
 
         public Point ClonePoint()
         {
-            var clone = (Point)CloneIdentity();
+            var clone = (Point)Clone();
             clone.Value = Value??0.0;
             clone.Quality = Quality;
             clone.Timestamp = Timestamp;
