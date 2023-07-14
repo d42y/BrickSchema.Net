@@ -9,7 +9,10 @@ namespace BrickSchema.Net.Classes.Devices
     public class Device : BrickClass
     {
         public string? Address { get; set; }
-        
+        public Device()
+        {
+            AddOrUpdateProperty(EntityProperties.PropertiesEnum.BrickClass, typeof(Device).Name);
+        }
         
     }
 

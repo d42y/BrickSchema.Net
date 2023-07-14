@@ -12,6 +12,10 @@ namespace BrickSchema.Net.Classes.Equipments
     public class HVAC : Equipment
     {
 
+        public HVAC()
+        {
+            AddOrUpdateProperty(EntityProperties.PropertiesEnum.BrickClass, typeof(HVAC).Name);
+        }
         public static string About
         {
             get

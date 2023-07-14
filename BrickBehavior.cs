@@ -144,11 +144,11 @@ namespace BrickSchema.Net
 
         } 
 
-        public BrickBehavior(string behaviorMode, string behaviorName, ILogger? logger = null)
+        public BrickBehavior(string behaviorMode, string behaviorName, double weight = 1, ILogger? logger = null)
         {
             AddOrUpdateProperty(PropertiesEnum.Name, behaviorName);
             AddOrUpdateProperty(PropertiesEnum.Running, false);
-            AddOrUpdateProperty(PropertiesEnum.Weight, 1); //to do
+            AddOrUpdateProperty(PropertiesEnum.Weight, weight);
             Type = this.GetType().Name;
             AddOrUpdateProperty(PropertiesEnum.BehaviorMode, behaviorMode);
             _logger = logger;
@@ -180,7 +180,27 @@ namespace BrickSchema.Net
             return clone;
         }
 
-        
+        public BehaviorValue SetConformance(double value)
+        {
+            AddOrUpdateProperty(PropertiesEnum.Conformance, value);
+            BehaviorValue bv = new(PropertiesEnum.Conformance, Id, Name, Type, BehaviorMode);
+            bv.SetValue(value);
+            return bv;
+
+        }
+
+        public BehaviorValue SetBehaviorValue<T>(string valueName, T value)
+        {
+            AddOrUpdateProperty(valueName, value);
+            BehaviorValue bv = new(valueName, Id, Name, Type, BehaviorMode);
+            bv.SetValue(value);
+            return bv;
+        }
+
+        public BehaviorValue SetBehaviorValue<T>(PropertiesEnum valueName, T value)
+        {
+            return SetBehaviorValue(valueName.ToString(), value);
+        }
         
         #endregion public fucntions
 
@@ -247,7 +267,11 @@ namespace BrickSchema.Net
                         _isTaskRunning = true;
                         try
                         {
-                            var taskReturnCode = ProcessTask();
+                            var returnCode = ProcessTask(out List<BehaviorValue> values);
+                            if (returnCode == BehaviorReturnCodes.Good)
+                            {
+                                Parent?.SetBehaviorValue(values);
+                            }
                         }
                         catch { }
                         _isTaskRunning = false;
@@ -257,10 +281,10 @@ namespace BrickSchema.Net
                         _isAnalyticsRunning = true;
                         try
                         {
-                            var returnCode = ProcessAnalytics();
+                            var returnCode = ProcessAnalytics(out List<BehaviorValue> values);
                             if (returnCode == BehaviorReturnCodes.Good)
                             {
-                                
+                                Parent?.SetBehaviorValue(values);
                             }
                         }
                         catch { }
@@ -342,8 +366,16 @@ namespace BrickSchema.Net
             _executeByTimer = false; 
             Execute();
         }
-        protected virtual BehaviorReturnCodes ProcessTask() { return BehaviorReturnCodes.NotImplemented; }
-        protected virtual BehaviorReturnCodes ProcessAnalytics( ) { return BehaviorReturnCodes.NotImplemented; }
+        protected virtual BehaviorReturnCodes ProcessTask(out List<BehaviorValue> behaviorValues)
+        {
+            behaviorValues = new();
+            return BehaviorReturnCodes.NotImplemented;
+        }
+        protected virtual BehaviorReturnCodes ProcessAnalytics(out List<BehaviorValue> behaviorValues) 
+        {
+            behaviorValues = new();
+            return BehaviorReturnCodes.NotImplemented;
+        }
         protected virtual BehaviorReturnCodes GenerateInfo(out string info)
         {
             info = "Not Implimented.";

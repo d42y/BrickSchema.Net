@@ -8,6 +8,14 @@ namespace BrickSchema.Net.Classes
     public class Point : BrickClass
     {
         
+        public Point() 
+        {
+            AddOrUpdateProperty(EntityProperties.PropertiesEnum.BrickClass, typeof(Point).Name);
+        }
+        internal Point(BrickEntity entity) : base(entity) //for internal cloning
+        {
+            AddOrUpdateProperty(EntityProperties.PropertiesEnum.BrickClass, typeof(Point).Name);
+        }
 
         public double? Value
         {
@@ -55,12 +63,10 @@ namespace BrickSchema.Net.Classes
             
         }
 
-        public Point ClonePoint()
+
+        public override Point Clone()
         {
-            var clone = (Point)Clone();
-            clone.Value = Value??0.0;
-            clone.Quality = Quality;
-            clone.Timestamp = Timestamp;
+            var clone = new Point(base.Clone());
             return clone;
         }
     }

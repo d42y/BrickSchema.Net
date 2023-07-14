@@ -11,7 +11,10 @@ namespace BrickSchema.Net.Classes
 
     public class Location : BrickClass
     {
-
+        public Location() 
+        {
+            AddOrUpdateProperty(EntityProperties.PropertiesEnum.BrickClass, typeof(Location).Name);
+        }
         public List<BrickEntity> GetEntities()
         {
             var entities = OtherEntities

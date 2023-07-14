@@ -59,9 +59,19 @@ namespace BrickSchema.Net
             Behaviors.Remove(behavior);
         }
 
-        public List<BrickBehavior> GetBehaviors()
+        public List<BrickBehavior> GetBehaviors(bool byReference = false)
         {
-            return Behaviors;
+            if (byReference)
+            {
+                return Behaviors;
+            }
+
+            List<BrickBehavior> brickBehaviors = new();
+            foreach(var b in Behaviors)
+            {
+                brickBehaviors.Add(b.Clone());
+            }
+            return brickBehaviors;
         }
 
         public List<BrickBehavior> GetBehaviors(string type)

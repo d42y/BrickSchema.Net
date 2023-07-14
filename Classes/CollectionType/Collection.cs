@@ -7,7 +7,14 @@ using System.Threading.Tasks;
 namespace BrickSchema.Net.Classes.Collection
 {
     //Collection Class
-    public class Collection : BrickClass { }
+    public class Collection : BrickClass
+    {
+        public Collection()
+        {
+            AddOrUpdateProperty(EntityProperties.PropertiesEnum.BrickClass, typeof(Collection).Name);
+        }
+
+    }
 
     public class PVArray : Collection { }
     public class PhotovoltaicArray : Collection { }

@@ -8,5 +8,9 @@ namespace BrickSchema.Net.Classes
 {
     public class Tenant : BrickClass
     {
+        public Tenant() 
+        {
+            AddOrUpdateProperty(EntityProperties.PropertiesEnum.BrickClass, typeof(Tenant).Name);
+        }
     }
 }

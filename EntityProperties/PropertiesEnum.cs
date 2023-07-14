@@ -12,6 +12,7 @@ namespace BrickSchema.Net.EntityProperties
         //Genral
         Name = 0,
         Description = 1,
+        BrickClass,
         Info,
         Value,
         Timestamp,
@@ -31,6 +32,7 @@ namespace BrickSchema.Net.EntityProperties
         BehaviorMode,
         Errors,
         HasError,
+        BehaviorValues,
 
 
         //analytics
@@ -38,6 +40,7 @@ namespace BrickSchema.Net.EntityProperties
         Deviation,
         Weight,
 
+        
 
         Aggregate = 300,
 
@@ -110,5 +113,7 @@ namespace BrickSchema.Net.EntityProperties
 
         Unit,
 
+        //chiller
+        COP,
     }
 }

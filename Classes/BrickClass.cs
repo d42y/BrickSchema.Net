@@ -7,14 +7,19 @@ namespace BrickSchema.Net.Classes
         //events
         public event EventHandler OnValueChanged;
         
+        
+
         internal void NotifyValueChange()
         {
             OnValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public BrickClass() { }
+        public BrickClass() { 
+        
+            
+        }
 
-        public BrickClass(BrickEntity entity) : base(entity) { }
+        internal BrickClass(BrickEntity entity) : base(entity) { } //for internal cloning
 
         public string Name
         {

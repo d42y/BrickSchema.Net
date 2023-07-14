@@ -10,8 +10,8 @@ namespace BrickSchema.Net.Classes
     //Equipment class
     public class Equipment : BrickClass
     {
-        public Equipment() { } 
-        public Equipment(BrickEntity entity):base(entity) { }
+        public Equipment() { }
+        internal Equipment(BrickEntity entity):base(entity) { } //for internal use
 
         public override Equipment Clone()
         {

@@ -53,15 +53,23 @@ namespace BrickSchema.Net
             var clone = new BrickEntity();
             clone.Id = Id;
             clone.Type = Type;
-            foreach (var p in Properties)
+            foreach (var p in Properties ?? new())
             {
                 clone.Properties.Add(p.Clone());
             }
-            foreach (var r in Relationships)
+            foreach (var r in Relationships ?? new())
             {
                 clone.Relationships.Add(r.Clone());
             }
             clone.RegisteredBehaviors = new(RegisteredBehaviors);
+            foreach (var b in Behaviors??new())
+            {
+                clone.Behaviors.Add(b.Clone());
+            }
+            foreach (var s in Shapes??new())
+            {
+                clone.Shapes.Add(s.Clone());
+            }
             return clone;
         }
     

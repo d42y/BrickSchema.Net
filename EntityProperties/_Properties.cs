@@ -1,4 +1,5 @@
-﻿using BrickSchema.Net.EntityProperties;
+﻿using BrickSchema.Net.Behaviors;
+using BrickSchema.Net.EntityProperties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,104 @@ namespace BrickSchema.Net
     /// </summary>
     public partial class BrickEntity
     {
+
+        public void SetBehaviorValue<T>(BrickBehavior behavior, string valueName, T value)
+        {
+            var results = GetProperty<List<BehaviorValue>>(PropertiesEnum.BehaviorValues);
+            if (results == null) results = new();
+            var myValue = results?.FirstOrDefault(x=>x.Name== valueName && x.BehaviorId == behavior.Id);
+            if (myValue == null)
+            {
+                myValue = new(valueName, behavior);
+                myValue.SetValue(value);
+                results?.Add(myValue);
+            }  else
+            {
+                myValue.SetValue(value);
+            }
+            AddOrUpdateProperty(PropertiesEnum.BehaviorValues, results);
+        }
+
+        public void SetBehaviorValue(BehaviorValue value)
+        {
+            var results = GetProperty<List<BehaviorValue>>(PropertiesEnum.BehaviorValues);
+            if (results == null) results = new();
+            var myValue = results?.FirstOrDefault(x => x.Name == value.Name && x.BehaviorId == value.BehaviorId);
+            if (myValue == null)
+            {
+                myValue = value.Clone(false);
+                results?.Add(myValue);
+            }
+            else
+            {
+                myValue.UpdateValue(value);
+            }
+            AddOrUpdateProperty(PropertiesEnum.BehaviorValues, results);
+        }
+
+        public void SetBehaviorValue(List<BehaviorValue> values)
+        {
+            var results = GetProperty<List<BehaviorValue>>(PropertiesEnum.BehaviorValues);
+            if (results == null) results = new();
+            foreach (var value in values)
+            {
+                var myValue = results?.FirstOrDefault(x => x.Name == value.Name && x.BehaviorId == value.BehaviorId);
+                if (myValue == null)
+                {
+                    myValue = value.Clone(false);
+                    results?.Add(myValue);
+                }
+                else
+                {
+                    myValue.UpdateValue(value);
+                }
+            }
+            AddOrUpdateProperty(PropertiesEnum.BehaviorValues, results);
+        }
+
+        public BehaviorValue? GetBehaviorValue(string  behaviorId, string valueName)
+        {
+            var results = GetProperty<List<BehaviorValue>>(PropertiesEnum.BehaviorValues);
+            if (results == null) results = new();
+            var myValue = results?.FirstOrDefault(x => x.Name == valueName && x.BehaviorId == behaviorId);
+            return myValue;
+        }
+        public T? GetBehaviorValue<T>(string behaviorId, string valueName)
+        {
+            var results = GetProperty<List<BehaviorValue>>(PropertiesEnum.BehaviorValues);
+            if (results == null) results = new();
+            var myValue = results?.FirstOrDefault(x => x.Name == valueName && x.BehaviorId == behaviorId);
+            T? returnValue = default(T);
+            if (myValue != null)
+            {
+                returnValue = myValue.GetValue<T>();
+            }
+
+            return returnValue;
+        }
+
+        public (T? Value, U? Weight)  GetBehaviorValue<T, U>(string behaviorId, string valueName)
+        {
+            var results = GetProperty<List<BehaviorValue>>(PropertiesEnum.BehaviorValues);
+            if (results == null) results = new();
+            var myValue = results?.FirstOrDefault(x => x.Name == valueName && x.BehaviorId == behaviorId);
+            (T?, U?) returnValue = (default(T), default(U));
+            if (myValue != null)
+            {
+                returnValue = myValue.GetValue<T, U>();
+            }
+
+            return returnValue;
+        }
+
+        public List<BehaviorValue> GetBehaviorValues(string behaviorId)
+        {
+            var results = GetProperty<List<BehaviorValue>>(PropertiesEnum.BehaviorValues);
+            if (results == null) results = new();
+            var myValues = results?.Where(x => x.BehaviorId == behaviorId).ToList()??new();
+            return myValues;
+        }
+
 
         public void AddOrUpdateProperty<T>(string propertyName, T propertyValue)
         {
@@ -78,6 +177,7 @@ namespace BrickSchema.Net
         {
             return GetProperty<T>(property.ToString());
         }
+
 
 
     }
