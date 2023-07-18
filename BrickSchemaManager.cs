@@ -13,7 +13,7 @@ using BrickSchema.Net.Classes.Equipments.HVACType.TerminalUnits;
 using BrickSchema.Net.Classes.Locations;
 using BrickSchema.Net.Classes.Measureable;
 using BrickSchema.Net.Classes.Points;
-
+using Newtonsoft.Json;
 
 namespace BrickSchema.Net
 {
@@ -32,11 +32,41 @@ namespace BrickSchema.Net
         {
             _entities = new List<BrickEntity>();
             _brickPath = brickFilePath;
-            LoadSchema(_brickPath);
+            LoadSchemaFromFile(_brickPath);
         }
 
+        public void LoadSchemaFromJson(string json, bool appendOupdate = false)
+        {
+            var settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Newtonsoft.Json.Formatting.Indented };
+            var entities = JsonConvert.DeserializeObject<List<BrickEntity>>(json, settings) ?? new();
+            ImportEntities(entities, appendOupdate);
+        }
 
-        public void LoadSchema(string jsonLdFilePath)
+        private void ImportEntities(List<BrickEntity> entities, bool appendOupdate = false)
+        {
+            if (appendOupdate)
+            {
+                foreach (var e in entities)
+                {
+                    var _e = _entities.FirstOrDefault(x => x.Id == e.Id);
+                    if (_e == null) //add new
+                    {
+                        _e = e;
+                        _entities.Add(_e);
+                    }
+                    else //update
+                    {
+                        _e = e;
+                    }
+                }
+            }
+            else
+            {
+                _entities = entities;
+            }
+        }
+
+        public void LoadSchemaFromFile(string jsonLdFilePath)
         {
             _entities = BrickSchemaUtility.ImportBrickSchema(jsonLdFilePath);
             // Update the OtherEntities property of all entities
@@ -66,6 +96,7 @@ namespace BrickSchema.Net
         {
             return BrickSchemaUtility.ExportBrickSchemaToJson(_entities);
         }
+
 
         public List<dynamic> SearchEntities(Func<dynamic, bool> predicate)
         {

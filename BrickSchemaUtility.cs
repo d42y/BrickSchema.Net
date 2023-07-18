@@ -20,7 +20,7 @@ namespace BrickSchema.Net
             if (File.Exists(jsonLdFilePath))
             {
                 json = File.ReadAllText(jsonLdFilePath);
-            }
+            } 
             var settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Newtonsoft.Json.Formatting.Indented };
             return JsonConvert.DeserializeObject<List<BrickEntity>>(json, settings)??new();
         }
