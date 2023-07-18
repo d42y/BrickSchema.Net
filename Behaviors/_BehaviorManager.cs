@@ -8,7 +8,7 @@ namespace BrickSchema.Net
 {
     public partial class BrickSchemaManager
     {
-        public List<BrickBehavior> GetBehaviors(List<string> behaviorIds, bool byReference = false)
+        public List<BrickBehavior> GetBehaviors(List<string> behaviorIds, bool byReference = true)
         {
             List<BrickBehavior> brickBehaviors = new List<BrickBehavior>();
             foreach (var entity in _entities)
@@ -20,7 +20,7 @@ namespace BrickSchema.Net
             return brickBehaviors;
         }
 
-        public List<BrickBehavior> GetEquipmentBehaviors(string equipmentId, bool byReference = false)
+        public List<BrickBehavior> GetEquipmentBehaviors(string equipmentId, bool byReference = true)
         {
             var equipments = GetEquipments(new() { equipmentId });
 
@@ -35,7 +35,7 @@ namespace BrickSchema.Net
             return brickBehaviors;
         }
 
-        public Dictionary<string, string> GetRegisteredEquipmentBehaviors(string equipmentId, bool byReference = false)
+        public Dictionary<string, string> GetRegisteredEquipmentBehaviors(string equipmentId, bool byReference = true)
         {
             var equipments = GetEquipments(new() { equipmentId });
 

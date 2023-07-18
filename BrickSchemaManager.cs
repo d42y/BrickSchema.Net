@@ -59,7 +59,12 @@ namespace BrickSchema.Net
         public void SaveSchema(string jsonLdFilePath)
         {
             
-            BrickSchemaUtility.ExportBrickSchema(_entities, jsonLdFilePath);
+            BrickSchemaUtility.WriteBrickSchemaToFile(_entities, jsonLdFilePath);
+        }
+
+        public string ToJson()
+        {
+            return BrickSchemaUtility.ExportBrickSchemaToJson(_entities);
         }
 
         public List<dynamic> SearchEntities(Func<dynamic, bool> predicate)
@@ -154,28 +159,31 @@ namespace BrickSchema.Net
             return entity;
         }
 
-        public BrickEntity? GetEntity(string id, bool byReference = false)
+        public BrickEntity? GetEntity(string id, bool byReference = true)
         {
             var entity = _entities.FirstOrDefault(x => x.Id.Equals(id));
-            return byReference ? entity : entity?.Clone();
+            var behaviors = entity?.GetBehaviors(false);
+            var e = byReference ? entity : entity?.Clone();
+            e.AddOrUpdateProperty(EntityProperties.PropertiesEnum.Behaviors, behaviors);
+            return e;
         }
-        public List<BrickEntity> GetEntities(bool byReference = false)
+        public List<BrickEntity> GetEntities(bool byReference = true)
         {
-            if (byReference)
-            {
-                return _entities;
-            }
+            
 
             List<BrickEntity> entities = new();
             foreach (var entity in _entities)
             {
-                entities.Add(entity.Clone());
+                var behaviors = entity.GetBehaviors(false);
+                var e = byReference ? entity : entity.Clone();
+                e.AddOrUpdateProperty(EntityProperties.PropertiesEnum.Behaviors, behaviors);
+                entities.Add(e);
 
             }
             return entities;
 
         }
-        public List<BrickEntity> GetEntities<T>(bool byReference = false)
+        public List<BrickEntity> GetEntities<T>(bool byReference = true)
         {
             var type = Helpers.EntityUntils.GetTypeName<T>();
             if (string.IsNullOrEmpty(type) || type.Equals("null"))
@@ -198,14 +206,12 @@ namespace BrickSchema.Net
 
                     if (add)
                     {
-                        if (byReference)
-                        {
-                            entities.Add(entity);
-                        }
-                        else
-                        {
-                            entities.Add(entity.Clone());
-                        }
+                        var behaviors = entity.GetBehaviors(false);
+
+                        var e = byReference ? entity : entity.Clone();
+                        e.AddOrUpdateProperty(EntityProperties.PropertiesEnum.Behaviors, behaviors);
+                        entities.Add(e);
+                        
                     }
 
                 }
@@ -214,7 +220,7 @@ namespace BrickSchema.Net
             
         }
 
-        public Tag? GetTag(string name, bool byReference = false)
+        public Tag? GetTag(string name, bool byReference = true)
         {
             var tags = _entities.Where(x => (x.Type?.Equals(typeof(Tag).Name) ?? false)).ToList();
             if (tags == null) return null;
@@ -227,22 +233,23 @@ namespace BrickSchema.Net
             return null;
         }
 
-        public List<BrickEntity> GetEquipments(List<string> equipmentIds, bool byReference = false)
+        public List<BrickEntity> GetEquipments(List<string> equipmentIds, bool byReference = true)
         {
             List<BrickEntity> entities = new List<BrickEntity>();
-
-            foreach (var entity in _entities)
+            var matchedEntities = _entities.Where(x => equipmentIds.Contains(x.Id)).ToList();
+            
+            foreach (var entity in matchedEntities)
             {
                 if (entity is Equipment)
                 {
-                    entities.Add(byReference?entity:entity.Clone());
+                    var behaviors = entity.GetBehaviors(false);
+          
+                    var e = byReference ? entity : entity.Clone();
+                    e.AddOrUpdateProperty(EntityProperties.PropertiesEnum.Behaviors, behaviors);
+                    entities.Add(e);
                 }
             }
 
-            if (equipmentIds.Count > 0)
-            {
-                entities = entities.Where(x => equipmentIds.Contains(x.Id)).ToList();
-            }
             return entities;
         }
 

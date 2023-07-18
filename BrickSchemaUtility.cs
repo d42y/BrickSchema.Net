@@ -25,12 +25,21 @@ namespace BrickSchema.Net
             return JsonConvert.DeserializeObject<List<BrickEntity>>(json, settings)??new();
         }
 
-        public static void ExportBrickSchema(List<BrickEntity> entities, string jsonLdFilePath)
+        public static void WriteBrickSchemaToFile(List<BrickEntity> entities, string jsonLdFilePath)
+        {
+
+            var settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Newtonsoft.Json.Formatting.Indented };
+            JsonConvert.SerializeObject(entities, settings);
+            File.WriteAllText(jsonLdFilePath, JsonConvert.SerializeObject(entities, settings));
+        }
+
+        public static string ExportBrickSchemaToJson(List<BrickEntity> entities)
         {
             
             var settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Newtonsoft.Json.Formatting.Indented };
             JsonConvert.SerializeObject(entities, settings);
-            File.WriteAllText(jsonLdFilePath, JsonConvert.SerializeObject(entities, settings));
+            var json = JsonConvert.SerializeObject(entities, settings);
+            return json;
         }
     }
 }

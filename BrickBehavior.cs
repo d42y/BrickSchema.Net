@@ -176,7 +176,7 @@ namespace BrickSchema.Net
         public override BrickBehavior Clone()
         {
             var clone = new BrickBehavior(base.Clone());
-            clone.Parent = Parent?.Clone();
+            //clone.Parent = Parent?.Clone();
             return clone;
         }
 

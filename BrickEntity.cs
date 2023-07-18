@@ -62,10 +62,7 @@ namespace BrickSchema.Net
                 clone.Relationships.Add(r.Clone());
             }
             clone.RegisteredBehaviors = new(RegisteredBehaviors);
-            foreach (var b in Behaviors??new())
-            {
-                clone.Behaviors.Add(b.Clone());
-            }
+            //do not clone behaviors
             foreach (var s in Shapes??new())
             {
                 clone.Shapes.Add(s.Clone());

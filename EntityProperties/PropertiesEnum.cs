@@ -19,7 +19,9 @@ namespace BrickSchema.Net.EntityProperties
         ValueQuality,
 
         //behavior
-        PollRate = 100,
+        Behaviors,
+        PollRate,
+        
         Runable,
         Running,
         Insight,

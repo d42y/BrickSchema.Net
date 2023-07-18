@@ -47,7 +47,7 @@ namespace BrickSchema.Net
         public void RemoveBehavior(string type)
         {
             var behaviors = GetBehaviors(type);
-            foreach (var behavior in behaviors)
+            foreach (var behavior in behaviors??new())
             {
                 behavior.Stop();
                 Behaviors.Remove(behavior);
@@ -59,7 +59,7 @@ namespace BrickSchema.Net
             Behaviors.Remove(behavior);
         }
 
-        public List<BrickBehavior> GetBehaviors(bool byReference = false)
+        public List<BrickBehavior> GetBehaviors(bool byReference = true)
         {
             if (byReference)
             {
@@ -67,16 +67,24 @@ namespace BrickSchema.Net
             }
 
             List<BrickBehavior> brickBehaviors = new();
-            foreach(var b in Behaviors)
+            foreach(var b in Behaviors??new())
             {
                 brickBehaviors.Add(b.Clone());
             }
             return brickBehaviors;
         }
 
-        public List<BrickBehavior> GetBehaviors(string type)
+        public List<BrickBehavior> GetBehaviors(string type, bool byReference = true)
         {
-            return Behaviors.Where(x => x.Type == type).ToList();
+            var behaviors = Behaviors.Where(x => x.Type == type).ToList();
+            if (byReference) return behaviors;
+
+            List <BrickBehavior> brickBehaviors = new();
+            foreach (var behavior in Behaviors)
+            {
+                brickBehaviors.Add(behavior.Clone());
+            }
+            return brickBehaviors;
         }
 
     }
